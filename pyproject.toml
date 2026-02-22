@@ -1,6 +1,6 @@
 [project]
 name = "mcp"
-dynamic = ["version"]
+version = "2.0.0a1"
 description = "Model Context Protocol SDK"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -80,16 +80,8 @@ docs = [
 ]
 
 [build-system]
-requires = ["hatchling", "uv-dynamic-versioning"]
+requires = ["hatchling"]
 build-backend = "hatchling.build"
-
-[tool.hatch.version]
-source = "uv-dynamic-versioning"
-
-[tool.uv-dynamic-versioning]
-vcs = "git"
-style = "pep440"
-bump = true
 
 [project.urls]
 Homepage = "https://modelcontextprotocol.io"

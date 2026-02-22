@@ -1,0 +1,18 @@
+python-mcp (2.0.0~alpha1-1) unstable; urgency=medium
+
+  * Adopt upstream changes from main branch (v2.0.0-alpha)
+  * Update dependencies to match upstream requirements
+  * Update pydantic to >= 2.12.0
+  * Update jsonschema to >= 4.20.0
+  * Update sse-starlette to >= 3.0.0
+  * Update python3-jwt to >= 2.10.1
+  * Update typing-extensions to >= 4.13.0
+
+ -- Vítězslav Dvořák <info@vitexsoftware.cz>  Sat, 22 Feb 2026 22:56:00 +0100
+
+python-mcp (1.26.0-1) unstable; urgency=medium
+
+  * Initial Debian package release
+  * Model Context Protocol SDK v1.26.0
+
+ -- Vítězslav Dvořák <info@vitexsoftware.cz>  Sat, 25 Jan 2026 23:34:00 +0100

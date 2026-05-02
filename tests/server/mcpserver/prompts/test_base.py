@@ -1,7 +1,9 @@
+import threading
 from typing import Any
 
 import pytest
 
+from mcp.server.mcpserver import Context
 from mcp.server.mcpserver.prompts.base import AssistantMessage, Message, Prompt, UserMessage
 from mcp.types import EmbeddedResource, TextContent, TextResourceContents
 
@@ -13,7 +15,9 @@ class TestRenderPrompt:
             return "Hello, world!"
 
         prompt = Prompt.from_function(fn)
-        assert await prompt.render() == [UserMessage(content=TextContent(type="text", text="Hello, world!"))]
+        assert await prompt.render(None, Context()) == [
+            UserMessage(content=TextContent(type="text", text="Hello, world!"))
+        ]
 
     @pytest.mark.anyio
     async def test_async_fn(self):
@@ -21,7 +25,9 @@ class TestRenderPrompt:
             return "Hello, world!"
 
         prompt = Prompt.from_function(fn)
-        assert await prompt.render() == [UserMessage(content=TextContent(type="text", text="Hello, world!"))]
+        assert await prompt.render(None, Context()) == [
+            UserMessage(content=TextContent(type="text", text="Hello, world!"))
+        ]
 
     @pytest.mark.anyio
     async def test_fn_with_args(self):
@@ -29,7 +35,7 @@ class TestRenderPrompt:
             return f"Hello, {name}! You're {age} years old."
 
         prompt = Prompt.from_function(fn)
-        assert await prompt.render(arguments={"name": "World"}) == [
+        assert await prompt.render({"name": "World"}, Context()) == [
             UserMessage(content=TextContent(type="text", text="Hello, World! You're 30 years old."))
         ]
 
@@ -40,7 +46,7 @@ class TestRenderPrompt:
 
         prompt = Prompt.from_function(fn)
         with pytest.raises(ValueError):
-            await prompt.render(arguments={"age": 40})
+            await prompt.render({"age": 40}, Context())
 
     @pytest.mark.anyio
     async def test_fn_returns_message(self):
@@ -48,7 +54,9 @@ class TestRenderPrompt:
             return UserMessage(content="Hello, world!")
 
         prompt = Prompt.from_function(fn)
-        assert await prompt.render() == [UserMessage(content=TextContent(type="text", text="Hello, world!"))]
+        assert await prompt.render(None, Context()) == [
+            UserMessage(content=TextContent(type="text", text="Hello, world!"))
+        ]
 
     @pytest.mark.anyio
     async def test_fn_returns_assistant_message(self):
@@ -56,7 +64,9 @@ class TestRenderPrompt:
             return AssistantMessage(content=TextContent(type="text", text="Hello, world!"))
 
         prompt = Prompt.from_function(fn)
-        assert await prompt.render() == [AssistantMessage(content=TextContent(type="text", text="Hello, world!"))]
+        assert await prompt.render(None, Context()) == [
+            AssistantMessage(content=TextContent(type="text", text="Hello, world!"))
+        ]
 
     @pytest.mark.anyio
     async def test_fn_returns_multiple_messages(self):
@@ -70,7 +80,7 @@ class TestRenderPrompt:
             return expected
 
         prompt = Prompt.from_function(fn)
-        assert await prompt.render() == expected
+        assert await prompt.render(None, Context()) == expected
 
     @pytest.mark.anyio
     async def test_fn_returns_list_of_strings(self):
@@ -83,7 +93,7 @@ class TestRenderPrompt:
             return expected
 
         prompt = Prompt.from_function(fn)
-        assert await prompt.render() == [UserMessage(t) for t in expected]
+        assert await prompt.render(None, Context()) == [UserMessage(t) for t in expected]
 
     @pytest.mark.anyio
     async def test_fn_returns_resource_content(self):
@@ -102,7 +112,7 @@ class TestRenderPrompt:
             )
 
         prompt = Prompt.from_function(fn)
-        assert await prompt.render() == [
+        assert await prompt.render(None, Context()) == [
             UserMessage(
                 content=EmbeddedResource(
                     type="resource",
@@ -136,7 +146,7 @@ class TestRenderPrompt:
             ]
 
         prompt = Prompt.from_function(fn)
-        assert await prompt.render() == [
+        assert await prompt.render(None, Context()) == [
             UserMessage(content=TextContent(type="text", text="Please analyze this file:")),
             UserMessage(
                 content=EmbeddedResource(
@@ -169,7 +179,7 @@ class TestRenderPrompt:
             }
 
         prompt = Prompt.from_function(fn)
-        assert await prompt.render() == [
+        assert await prompt.render(None, Context()) == [
             UserMessage(
                 content=EmbeddedResource(
                     type="resource",
@@ -181,3 +191,21 @@ class TestRenderPrompt:
                 )
             )
         ]
+
+
+@pytest.mark.anyio
+async def test_sync_fn_runs_in_worker_thread():
+    """Sync prompt functions must run in a worker thread, not the event loop."""
+
+    main_thread = threading.get_ident()
+    fn_thread: list[int] = []
+
+    def blocking_fn() -> str:
+        fn_thread.append(threading.get_ident())
+        return "hello"
+
+    prompt = Prompt.from_function(blocking_fn)
+    messages = await prompt.render(None, Context())
+
+    assert messages == [UserMessage(content=TextContent(type="text", text="hello"))]
+    assert fn_thread[0] != main_thread

@@ -10,7 +10,7 @@ from mcp.types import Icon, ToolAnnotations
 
 if TYPE_CHECKING:
     from mcp.server.context import LifespanContextT, RequestT
-    from mcp.server.mcpserver.server import Context
+    from mcp.server.mcpserver.context import Context
 
 logger = get_logger(__name__)
 
@@ -18,18 +18,12 @@ logger = get_logger(__name__)
 class ToolManager:
     """Manages MCPServer tools."""
 
-    def __init__(
-        self,
-        warn_on_duplicate_tools: bool = True,
-        *,
-        tools: list[Tool] | None = None,
-    ):
+    def __init__(self, warn_on_duplicate_tools: bool = True, *, tools: list[Tool] | None = None):
         self._tools: dict[str, Tool] = {}
-        if tools is not None:
-            for tool in tools:
-                if warn_on_duplicate_tools and tool.name in self._tools:
-                    logger.warning(f"Tool already exists: {tool.name}")
-                self._tools[tool.name] = tool
+        for tool in tools or ():
+            if warn_on_duplicate_tools and tool.name in self._tools:
+                logger.warning(f"Tool already exists: {tool.name}")
+            self._tools[tool.name] = tool
 
         self.warn_on_duplicate_tools = warn_on_duplicate_tools
 
@@ -81,7 +75,7 @@ class ToolManager:
         self,
         name: str,
         arguments: dict[str, Any],
-        context: Context[LifespanContextT, RequestT] | None = None,
+        context: Context[LifespanContextT, RequestT],
         convert_result: bool = False,
     ) -> Any:
         """Call a tool by name with arguments."""
@@ -89,4 +83,4 @@ class ToolManager:
         if not tool:
             raise ToolError(f"Unknown tool: {name}")
 
-        return await tool.run(arguments, context=context, convert_result=convert_result)
+        return await tool.run(arguments, context, convert_result=convert_result)

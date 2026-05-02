@@ -2,22 +2,24 @@
 
 from __future__ import annotations
 
-import inspect
+import functools
 import re
 from collections.abc import Callable
 from typing import TYPE_CHECKING, Any
 from urllib.parse import unquote
 
+import anyio.to_thread
 from pydantic import BaseModel, Field, validate_call
 
 from mcp.server.mcpserver.resources.types import FunctionResource, Resource
 from mcp.server.mcpserver.utilities.context_injection import find_context_parameter, inject_context
 from mcp.server.mcpserver.utilities.func_metadata import func_metadata
+from mcp.shared._callable_inspection import is_async_callable
 from mcp.types import Annotations, Icon
 
 if TYPE_CHECKING:
     from mcp.server.context import LifespanContextT, RequestT
-    from mcp.server.mcpserver.server import Context
+    from mcp.server.mcpserver.context import Context
 
 
 class ResourceTemplate(BaseModel):
@@ -99,17 +101,22 @@ class ResourceTemplate(BaseModel):
         self,
         uri: str,
         params: dict[str, Any],
-        context: Context[LifespanContextT, RequestT] | None = None,
+        context: Context[LifespanContextT, RequestT],
     ) -> Resource:
-        """Create a resource from the template with the given parameters."""
+        """Create a resource from the template with the given parameters.
+
+        Raises:
+            ValueError: If creating the resource fails.
+        """
         try:
             # Add context to params if needed
             params = inject_context(self.fn, params, context, self.context_kwarg)
 
-            # Call function and check if result is a coroutine
-            result = self.fn(**params)
-            if inspect.iscoroutine(result):
-                result = await result
+            fn = self.fn
+            if is_async_callable(fn):
+                result = await fn(**params)
+            else:
+                result = await anyio.to_thread.run_sync(functools.partial(self.fn, **params))
 
             return FunctionResource(
                 uri=uri,  # type: ignore

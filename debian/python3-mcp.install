@@ -1,2 +1,2 @@
 python3-mcp.svg	usr/share/icons/hicolor/scalable/apps/
-io.modelcontextprotocol.python_sdk.metainfo.xml	usr/share/metainfo/
+debian/io.modelcontextprotocol.python_sdk.metainfo.xml	usr/share/metainfo/

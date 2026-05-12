@@ -1,0 +1,25 @@
+#!/usr/bin/make -f
+
+export PYBUILD_NAME=mcp
+export PEP440_VERSION := $(shell dpkg-parsechangelog -S Version | cut -d- -f1 | sed 's/~alpha/a/;s/~beta/b/;s/~rc/rc/')
+%:
+	dh $@ --with python3 --buildsystem=pybuild
+
+override_dh_auto_configure:
+	# Patch to use static version from changelog (converted to PEP 440)
+	sed -i 's/dynamic = \["version"\]/version = "$(PEP440_VERSION)"/' pyproject.toml
+	sed -i 's/requires = \["hatchling", "uv-dynamic-versioning"\]/requires = ["hatchling"]/' pyproject.toml
+	sed -i '/\[tool.hatch.version\]/,/^$$/d' pyproject.toml
+	sed -i '/\[tool.uv-dynamic-versioning\]/,/^$$/d' pyproject.toml
+	dh_auto_configure
+
+override_dh_install:
+	dh_install --sourcedir=.
+
+override_dh_auto_test:
+	# Skip tests
+
+override_dh_auto_clean:
+	dh_auto_clean
+	# Restore if needed
+	git checkout pyproject.toml 2>/dev/null || true

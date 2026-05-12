@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="addon">
+  <id>io.modelcontextprotocol.python_sdk</id>
+  <icon type="stock">python3-mcp</icon>
+  <metadata_license>MIT</metadata_license>
+  <project_license>MIT</project_license>
+  <name>Python MCP SDK</name>
+  <summary>Model Context Protocol SDK for Python</summary>
+  <description>
+    <p>
+      The Model Context Protocol (MCP) Python SDK enables building MCP servers and clients. MCP is an open protocol that standardizes how applications provide context to LLMs, enabling integration between AI models and external data sources or tools.
+    </p>
+  </description>
+  <url type="homepage">https://modelcontextprotocol.io</url>
+  <url type="bugtracker">https://github.com/modelcontextprotocol/python-sdk/issues</url>
+  <developer id="io.modelcontextprotocol">
+    <name>Anthropic</name>
+  </developer>
+  <content_rating type="oars-1.1"/>
+</component>

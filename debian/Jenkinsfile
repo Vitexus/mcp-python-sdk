@@ -11,7 +11,8 @@ String[] distributions = [
 ,
 //'ubuntu:jammy',
 //'ubuntu:noble',
-'ubuntu:resolute'
+// ubuntu:resolute disabled: python3-anyio, python3-httpx, python3-jsonschema etc. not yet available at required versions.
+//'ubuntu:resolute'
 ]
 
 String vendor = 'vitexsoftware'

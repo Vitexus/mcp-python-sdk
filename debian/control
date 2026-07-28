@@ -14,29 +14,45 @@ Vcs-Git: https://github.com/modelcontextprotocol/python-sdk.git
 Vcs-Browser: https://github.com/modelcontextprotocol/python-sdk
 Rules-Requires-Root: no
 
+Package: python3-mcp-types
+Architecture: all
+Depends:
+ ${misc:Depends},
+ ${python3:Depends},
+ python3-pydantic (>= 2.12.0),
+ python3-typing-extensions (>= 4.13.0),
+Description: Model Context Protocol wire types (Python)
+ mcp-types provides the pydantic-based wire types for the Model
+ Context Protocol (MCP): the protocol message models, JSON-RPC
+ envelope types, per-version surface validators, and the
+ protocol-version registry.
+ .
+ Split out of the main mcp package as its own dependency starting
+ with mcp 2.0, so traffic can be (de)serialized without pulling in
+ the full SDK.
+
 Package: python3-mcp
 Architecture: all
 Depends:
  ${misc:Depends},
  ${python3:Depends},
- python3-anyio (>= 4.5),
- python3-httpx (>= 0.27.1),
- python3-httpx-sse (>= 0.4),
- python3-pydantic (>= 2.11.0),
+ python3-mcp-types (= ${source:Version}),
+ python3-anyio (>= 4.9),
+ python3-httpx2 (>= 2.5.0),
+ python3-pydantic (>= 2.12.0),
  python3-starlette (>= 0.27),
  python3-multipart (>= 0.0.9),
- python3-sse-starlette (>= 1.6.1),
- python3-pydantic-settings (>= 2.5.2),
+ python3-sse-starlette (>= 3.0.0),
  python3-uvicorn (>= 0.31.1),
  python3-jsonschema (>= 4.20.0),
  python3-jwt (>= 2.10.1),
- python3-typing-extensions (>= 4.9.0),
+ python3-typing-extensions (>= 4.13.0),
  python3-typing-inspection (>= 0.4.1),
+ python3-opentelemetry-api (>= 1.28.0),
 Suggests:
  python3-rich (>= 13.9.4),
  python3-typer (>= 0.16.0),
  python3-dotenv (>= 1.0.0),
- python3-websockets (>= 15.0.1),
 Description: Model Context Protocol SDK for Python
  The Model Context Protocol (MCP) provides a standardized way to
  connect AI agents to tools and data sources. This SDK implements the

@@ -1,3 +1,19 @@
+python-mcp (1:2.0.0-1) unstable; urgency=medium
+
+  * Update to upstream v2.0.0 (stable v2 release).
+  * Split mcp-types into its own binary package (python3-mcp-types),
+    matching upstream's v2 dependency split.
+  * Update dependency floors for v2: pydantic >= 2.12.0, sse-starlette
+    >= 3.0.0, typing-extensions >= 4.13.0, anyio >= 4.9.
+  * Replace httpx/httpx-sse with httpx2; add opentelemetry-api; drop
+    pydantic-settings (no longer a runtime dependency) and the
+    websockets Suggests (transport removed upstream).
+  * debian/rules: build both pyproject.toml roots (., src/mcp-types) via
+    a new patch-dynamic-pyproject.py helper that statically pins version
+    and dependencies before the pybuild step.
+
+ -- Vítězslav Dvořák <info@vitexsoftware.cz>  Tue, 28 Jul 2026 20:58:49 +0200
+
 python-mcp (1:1.27.1-1) unstable; urgency=medium
 
   * Update to upstream v1.27.1 (stable 1.x series)

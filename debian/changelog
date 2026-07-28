@@ -1,3 +1,36 @@
+python-mcp (1:2.0.0~b2-1~vitex2) unstable; urgency=medium
+
+  * Relax python3-mcp-types dep to >= 2.0.0~b2 (was exact = 2.0.0~b2,
+    which doesn't match the actual installed Debian revision string).
+
+ -- Vítězslav Dvořák <info@vitexsoftware.cz>  Mon, 27 Jul 2026 17:52:07 +0200
+
+python-mcp (1:2.0.0~b2-1~vitex1) unstable; urgency=medium
+
+  * Update to upstream v2.0.0b2 (v2.0 line), overriding the 1:1.27.1-1
+    revert below: development of the v2 line resumed and has since
+    reached rc1 upstream (2.0.0b2 is what fastmcp 4.0.0a2's own
+    fastmcp-slim package hard-pins as its exact mcp requirement).
+    Keep epoch 1: so this still supersedes 1:1.27.1 by version
+    comparison; add a ~vitex1 local suffix as this is a local,
+    non-archive build for the mcprack fastmcp 4.0.0a2 migration.
+  * debian/control: replace python3-httpx/python3-httpx-sse with
+    python3-httpx2 (upstream moved to httpx2 in this release, see
+    upstream commit "Replace httpx and httpx-sse with httpx2" #2972);
+    add python3-mcp-types (= 2.0.0~b2) and
+    python3-opentelemetry-api (>= 1.28.0), both new dependencies in
+    this release; bump python3-anyio to >= 4.9, python3-pydantic to
+    >= 2.12.0, python3-sse-starlette to >= 3.0.0,
+    python3-typing-extensions to >= 4.13.0 to match.
+  * pyproject.toml: statically resolve the upstream dynamic version
+    and dynamic (metadata-hook-templated) dependencies list, since the
+    uv-dynamic-versioning hatchling metadata hook plugin isn't
+    packaged for Debian; mirrors debian/rules' existing
+    override_dh_auto_configure approach for the plain dynamic-version
+    case, extended here to also cover dynamic dependencies.
+
+ -- Vítězslav Dvořák <info@vitexsoftware.cz>  Mon, 27 Jul 2026 17:45:00 +0200
+
 python-mcp (1:1.27.1-1) unstable; urgency=medium
 
   * Update to upstream v1.27.1 (stable 1.x series)
